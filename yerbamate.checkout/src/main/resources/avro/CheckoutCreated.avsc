@@ -1,0 +1,15 @@
+{
+    "type": "record",
+    "name": "CheckoutCreatedEvent",
+    "namespace": "org.vescm.yerbamate.checkout.event",
+    "fields": [
+        {
+            "name": "checkoutCode",
+            "type": ["string"]
+        },
+        {
+            "name": "status",
+            "type": ["string"]
+        }
+    ]
+}
