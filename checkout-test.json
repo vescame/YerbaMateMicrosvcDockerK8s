@@ -1,0 +1,22 @@
+{
+  "firstName": "Ride",
+  "lastName": "The Lightning",
+  "email": "metallica@mail.com",
+  "address": "St. Anger",
+  "complement": "",
+  "country": "Brazil",
+  "state": "São Paulo",
+  "cep": "12763-566",
+  "saveAddress": "true",
+  "saveInfo": "true",
+  "paymentMethod": "Credit Card",
+  "cardName": "Ride T Lightning",
+  "cardNumber": "1231 3214 5123 1122",
+  "cardDate": "10/2023",
+  "cardCvv": "323",
+  "products": [
+    "Yerba Taragui",
+    "Calabaza de Madeira",
+    "Yerba Barão Tipo Chimarrão"
+  ]
+}
