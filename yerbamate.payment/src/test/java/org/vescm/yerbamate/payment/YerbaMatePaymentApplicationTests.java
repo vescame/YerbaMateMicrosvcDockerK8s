@@ -5,4 +5,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
 class YerbaMatePaymentApplicationTests {
+	@Test
+	void contextLoads() {
+	}
 }

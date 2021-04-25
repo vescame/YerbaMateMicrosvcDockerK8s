@@ -5,4 +5,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
 class YerbaMateCheckoutApplicationTests {
+	@Test
+	void contextLoads() {
+	}
 }

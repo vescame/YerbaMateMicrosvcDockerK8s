@@ -27,28 +27,28 @@ help:
 build: build-checkout build-payment build-mailer
 
 build-checkout: run-db-checkout
-	gradle -p yerbamate.checkout build
-	docker build --force-rm -t yerbamate-checkout --no-cache \
+	docker build --force-rm -t yerbamate-checkout \
 		-f yerbamate.checkout/Dockerfile \
+		--network yerbamatedev \
 		yerbamate.checkout/
 
 build-payment: run-db-payment
-	gradle -p yerbamate.payment build
-	docker build --force-rm -t yerbamate-payment --no-cache \
+	docker build --force-rm -t yerbamate-payment \
 		-f yerbamate.payment/Dockerfile \
+		--network yerbamatedev \
 		yerbamate.payment/
 
 build-mailer: run-db-mailer
-	gradle -p yerbamate.mailer build
-	docker build --force-rm -t yerbamate-mailer --no-cache \
+	docker build --force-rm -t yerbamate-mailer \
 		-f yerbamate.mailer/Dockerfile \
+		--network yerbamatedev \
 		yerbamate.mailer/
 
 run-network:
 	docker network create yerbamatedev
 
 rm-network:
-	docker network remove yerbamatedev
+	docker network rm yerbamatedev
 
 # RUN
 run: run-network run-broker run-checkout run-payment run-mailer
@@ -56,18 +56,21 @@ run: run-network run-broker run-checkout run-payment run-mailer
 run-checkout: build-checkout
 	docker run -d --name yerbamate-checkout --hostname checkout \
 		-p 8085:8085 \
+		-e checkout_db_host=dbcheckout \
 		--network yerbamatedev \
 		yerbamate-checkout
 
 run-payment: build-payment
 	docker run -d --name yerbamate-payment --hostname payment \
 		-p 8086:8086 \
+		-e payment_db_host=dbpayment \
 		--network yerbamatedev \
 		yerbamate-payment
 
 run-mailer: build-mailer
 	docker run -d --name yerbamate-mailer --hostname mailer \
 		-p 8087:8087 \
+		-e mailer_db_host=dbmailer \
 		--network yerbamatedev \
 		yerbamate-mailer
 
