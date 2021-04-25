@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgres-configmap
+  namespace: dev
+data:
+  pg-checkout-db: checkout
+  pg-payment-db: payment
+  pg-mailer-db: mailer
+
+# vim: et sw=2 ts=2 sts=2 :

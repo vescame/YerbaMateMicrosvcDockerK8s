@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: broker-configmap
+  namespace: dev
+data:
+  broker_url: 'kafka:9092'
+  zookeeper_client_port: '2181'
+  zookeeper_tick_time: '2000'
+  zookeeper_url: 'zookeeper:2181'
+  schema_registry_host_name: 'schema-registry'
+  kafka_broker_id: '1'
+  kafka_listener_security_protocol_map: 'PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT'
+  kafka_advertised_listeners: 'PLAINTEXT://kafka:29092,PLAINTEXT_HOST://kafka:9092'
+  kafka_metric_reporters: 'io.confluent.metrics.reporter.ConfluentMetricsReporter'
+  kafka_offsets_topic_replication_factor: '1'
+  kafka_group_initial_rebalance_delay_ms: '0'
+  confluent_metrics_reporter_topic_replicas: '1'
+  confluent_metrics_enable: 'true'
+  confluent_support_customer_id: 'anonymous'
+
+# vim: et sw=2 ts=2 sts=2 :

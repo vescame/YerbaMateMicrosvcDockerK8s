@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: yerbamate-checkout
+  namespace: dev
+  labels:
+    app: yerbamate-checkout
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: yerbamate-checkout
+  template:
+      metadata:
+        labels:
+          app: yerbamate-checkout
+      spec:
+        containers:
+          - name: yerbamate-checkout
+            image: yerbamate-checkout:latest
+            imagePullPolicy: Never
+            ports:
+              - containerPort: 8085
+            env:
+              - name: JAVA_OPTS
+                value: "-XX:MaxRAMPercentage=80"
+              - name: checkout_db_host
+                value: dbcheckout
+            livenessProbe:
+              httpGet:
+                path: /subjects
+                port: schema-registry
+              initialDelaySeconds: 30
+#            readinessProbe:
+#              httpGet:
+#                path: /app/actuator/health/readiness
+#                port: 8085
+#              initialDelaySeconds: 30
+            resources:
+              requests:
+                memory: "256Mi"
+                cpu: "0.5"
+              limits:
+                memory: "512Mi"
+                cpu: "0.5"
+
+# vim: et sw=2 ts=2 sts=2 :

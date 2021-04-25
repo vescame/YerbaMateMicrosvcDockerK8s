@@ -1,0 +1,15 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: yerbamate-checkout-svc
+  namespace: dev
+spec:
+  selector:
+    app: yerbamate-checkout
+  type: NodePort
+  ports:
+    - protocol: TCP
+      port: 8085
+      targetPort: 8085
+
+# vim: et sw=2 ts=2 sts=2 :

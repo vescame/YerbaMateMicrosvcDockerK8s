@@ -1,0 +1,15 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: yerbamate-mailer-svc
+  namespace: dev
+spec:
+  selector:
+    app: yerbamate-mailer
+  type: NodePort
+  ports:
+    - protocol: TCP
+      port: 8087
+      targetPort: 8087
+
+# vim: et sw=2 ts=2 sts=2 :

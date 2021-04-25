@@ -1,0 +1,19 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: yerbamate-microsvc-ingress
+  namespace: dev
+spec:
+  rules:
+    - host: dev
+      http:
+        paths:
+        - path: /
+          pathType: Prefix
+          backend:
+            service:
+             name: yerbamate-checkout-svc
+             port:
+               number: 8085
+
+# vim: et sw=2 ts=2 sts=2 :

@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres-checkout
+  namespace: dev
+spec:
+  selector:
+    matchLabels:
+      app: postgres-checkout
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: postgres-checkout
+    spec:
+      containers:
+        - image: postgres:latest
+          name: postgres-checkout
+          env:
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secrets
+                  key: pg-checkout-user
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secrets
+                  key: pg-checkout-passwd
+            - name: POSTGRES_DB
+              valueFrom:
+                configMapKeyRef:
+                  name: postgres-configmap
+                  key: pg-checkout-db
+          ports:
+            - containerPort: 5432
+              name: postgres
+
+# vim: et sw=2 ts=2 sts=2 :

@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres-mailer
+  namespace: dev
+spec:
+  selector:
+    matchLabels:
+      app: postgres-mailer
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: postgres-mailer
+    spec:
+      containers:
+        - image: postgres:latest
+          name: postgres-mailer
+          env:
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secrets
+                  key: pg-mailer-user
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secrets
+                  key: pg-mailer-passwd
+            - name: POSTGRES_DB
+              valueFrom:
+                configMapKeyRef:
+                  name: postgres-configmap
+                  key: pg-mailer-db
+          ports:
+            - containerPort: 5434
+              name: postgres
+
+# vim: et sw=2 ts=2 sts=2 :

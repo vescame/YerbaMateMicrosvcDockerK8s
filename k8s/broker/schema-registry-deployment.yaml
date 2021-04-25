@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: schema-registry
+  namespace: dev
+spec:
+  selector:
+    matchLabels:
+      app: schema-registry
+  template:
+    metadata:
+      labels:
+        app: schema-registry
+    spec:
+      containers:
+        - image: confluentinc/cp-schema-registry:latest
+          name: schema-registry
+          env:
+            - name: SCHEMA_REGISTRY_HOST_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: broker-configmap
+                  key: schema_registry_host_name
+            - name: SCHEMA_REGISTRY_KAFKASTORE_CONNECTION_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: broker-configmap
+                  key: zookeeper_url
+          ports:
+            - containerPort: 8081
+              name: schema-registry
+
+# vim: et sw=2 ts=2 sts=2 :

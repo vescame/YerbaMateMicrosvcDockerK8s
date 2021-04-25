@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: yerbamate-payment
+  namespace: dev
+  labels:
+    app: yerbamate.microservices
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: yerbamate.microservices
+  template:
+      metadata:
+        labels:
+          app: yerbamate.microservices
+      spec:
+        containers:
+          - name: yerbamate-payment
+            image: yerbamate-payment:latest
+            imagePullPolicy: Never
+            ports:
+              - containerPort: 8086
+            env:
+              - name: JAVA_OPTS
+                value: "-XX:MaxRAMPercentage=80"
+              - name: payment_db_host
+                value: dbpayment
+            livenessProbe:
+              httpGet:
+                path: /subjects
+                port: schema-registry
+              initialDelaySeconds: 30
+#            readinessProbe:
+#              httpGet:
+#                path: /app/actuator/health/readiness
+#                port: 8085
+#              initialDelaySeconds: 30
+            resources:
+              requests:
+                memory: "256Mi"
+                cpu: "0.5"
+              limits:
+                memory: "512Mi"
+                cpu: "0.5"
+
+# vim: et sw=2 ts=2 sts=2 :

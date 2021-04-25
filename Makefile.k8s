@@ -1,0 +1,165 @@
+# defaul shell
+SHELL = /bin/sh
+
+# Rule "help"
+.PHONY: help
+.SILENT: help
+help:
+	echo "Use make [RULES]"
+	echo ""
+	echo "Main RULES:"
+	echo ""
+	echo "k-setup		- init minikube machine"
+	echo "k-cache		- build images and load inside minikube"
+	echo "k-deploy	- deploy db, microsvcs, broker and ingress"
+	echo ""
+	echo "k-all		- do all the above k- steps"
+	echo "k-start		- start minikube machine"
+	echo "k-stop		- stop minikube machine"
+	echo "k-deploy	- deploy all k8s services"
+	echo "k-undeploy	- remove all k8s services"
+	echo "k-destroy	- stop and delete minikube machine"
+	echo ""
+	echo "check		- check tools versions"
+	echo "help		- show this message"
+
+k-setup:
+	minikube -p dev start --cpus 2 --memory=2048
+	minikube -p dev addons enable ingress
+	minikube -p dev addons enable metrics-server
+	kubectl create namespace dev
+
+k-get-ip:
+	minikube -p dev ip
+
+k-get-svc:
+	minikube -p dev service -n dev yerbamate-checkout-svc
+
+k-dashboard:
+	minikube -p dev dashboard
+
+k-deploy-postgres:
+	kubectl apply -f k8s/postgres/
+	sleep 30
+
+d-network:
+	docker network create buildtmp
+
+d-delete-network:
+	docker network rm buildtmp
+
+d-db-checkout:
+	docker rm -f dbtmp
+	docker run -d --name dbtmp --hostname dbcheckout \
+		-p 5432:5432  \
+		-e POSTGRES_USER=checkout_db_user \
+		-e POSTGRES_PASSWORD=checkout_db_password \
+		-e POSTGRES_DB=checkout \
+		--network buildtmp \
+		postgres:latest
+
+d-db-payment:
+	docker rm -f dbtmp
+	docker run -d --name dbtmp --hostname dbpayment \
+		-p 5432:5432 \
+		-e POSTGRES_DB=payment \
+		-e POSTGRES_USER=payment_db_user \
+		-e POSTGRES_PASSWORD=payment_db_password \
+		--network buildtmp \
+		postgres:latest
+
+d-db-mailer:
+	docker rm -f dbtmp
+	docker run -d --name dbtmp --hostname dbmailer \
+		-p 5432:5432 \
+		-e POSTGRES_DB=mailer \
+		-e POSTGRES_USER=mailer_db_user \
+		-e POSTGRES_PASSWORD=mailer_db_password \
+		--network buildtmp \
+		postgres:latest
+
+d-build-checkout: d-db-checkout
+	docker build --force-rm -t yerbamate-checkout \
+		-f yerbamate.checkout/Dockerfile \
+		--network buildtmp \
+		yerbamate.checkout/
+
+d-build-payment: d-db-payment
+	docker build --force-rm -t yerbamate-payment \
+		-f yerbamate.payment/Dockerfile \
+		--network buildtmp \
+		yerbamate.payment/
+
+d-build-mailer: d-db-mailer
+	docker build --force-rm -t yerbamate-mailer \
+		-f yerbamate.mailer/Dockerfile \
+		--network buildtmp \
+		yerbamate.mailer/
+
+k-build: d-network d-build-checkout d-build-payment d-build-mailer
+	docker rm -f dbtmp
+	docker network rm buildtmp
+
+k-cache: k-build
+	minikube -p dev cache add yerbamate-checkout:latest
+	minikube -p dev cache add yerbamate-payment:latest
+	minikube -p dev cache add yerbamate-mailer:latest
+
+k-deploy-checkout:
+	kubectl apply -f k8s/yerbamate.checkout/
+
+k-deploy-payment:
+	kubectl apply -f k8s/yerbamate.payment/
+
+k-deploy-mailer:
+	kubectl apply -f k8s/yerbamate.mailer/
+
+k-deploy-broker:
+	kubectl apply -f k8s/broker/
+	sleep 30
+
+k-delete-broker:
+	kubectl delete -f k8s/broker/
+
+k-deploy-ingress:
+	kubectl apply -f k8s/ingress/
+
+k-delete-ingress:
+	kubectl delete -f k8s/ingress/
+
+k-deploy: k-deploy-ingress k-deploy-broker k-deploy-postgres \
+	k-deploy-checkout k-deploy-payment k-deploy-mailer
+
+k-delete-checkout:
+	kubectl delete -f k8s/yerbamate.checkout/
+
+k-delete-payment:
+	kubectl delete -f k8s/yerbamate.payment/
+
+k-delete-mailer:
+	kubectl delete -f k8s/yerbamate.mailer/
+
+k-delete-db:
+	kubectl delete -f k8s/postgres/
+
+k-undeploy: k-delete-ingress k-delete-broker k-delete-db \
+	k-delete-checkout k-delete-payment k-delete-mailer
+
+k-start:
+	minikube -p dev start
+
+k-stop:
+	minikube -p dev stop;
+
+k-all: k-setup k-cache k-deploy
+
+k-destroy:
+	minikube -p dev stop && minikube -p dev delete
+
+check:
+	@make --version
+	@echo ""
+	@minikube version
+	@echo ""
+	@kubectl version --short --client
+

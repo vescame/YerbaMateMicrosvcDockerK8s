@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres-payment
+  namespace: dev
+spec:
+  selector:
+    matchLabels:
+      app: postgres-payment
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: postgres-payment
+    spec:
+      containers:
+        - image: postgres:latest
+          name: postgres-payment
+          env:
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secrets
+                  key: pg-payment-user
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secrets
+                  key: pg-payment-passwd
+            - name: POSTGRES_DB
+              valueFrom:
+                configMapKeyRef:
+                  name: postgres-configmap
+                  key: pg-payment-db
+          ports:
+            - containerPort: 5433
+              name: postgres
+
+# vim: et sw=2 ts=2 sts=2 :
