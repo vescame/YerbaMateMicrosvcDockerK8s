@@ -158,17 +158,17 @@ run-broker: run-zookeeper run-kafka run-schema-registry
 rm-broker: rm-zookeeper rm-kafka rm-schema-registry
 
 run-kafka:
-	docker run -d --name kafka --hostname broker \
+	docker run -d --name kafka --hostname kafka \
 		-p 29092:29092 \
 		-p 9092:9092 \
 		-e KAFKA_BROKER_ID=1 \
 		-e KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181 \
 		-e KAFKA_LISTENER_SECURITY_PROTOCOL_MAP='PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT' \
-		-e KAFKA_ADVERTISED_LISTENERS='PLAINTEXT://broker:29092,PLAINTEXT_HOST://broker:9092' \
+		-e KAFKA_ADVERTISED_LISTENERS='PLAINTEXT://kafka:29092,PLAINTEXT_HOST://kafka:9092' \
 		-e KAFKA_METRIC_REPORTERS='io.confluent.metrics.reporter.ConfluentMetricsReporter' \
 		-e KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1 \
 		-e KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS=0 \
-		-e CONFLUENT_METRICS_REPORTER_BOOTSTRAP_SERVERS=broker:9092 \
+		-e CONFLUENT_METRICS_REPORTER_BOOTSTRAP_SERVERS=kafka:9092 \
 		-e CONFLUENT_METRICS_REPORTER_ZOOKEEPER_CONNECT=zookeeper:2181 \
 		-e CONFLUENT_METRICS_REPORTER_TOPIC_REPLICAS=1 \
 		-e CONFLUENT_METRICS_ENABLE='true' \
