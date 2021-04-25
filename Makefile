@@ -210,3 +210,10 @@ stop-schema-registry:
 rm-schema-registry: stop-schema-registry
 	docker rm schema-registry
 
+clean: rm-db rm-broker rm rm-network
+
+check:
+	@make --version
+	@echo ""
+	@docker version
+
